@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include <sstream>
-#include "file_reader.h"
-#include "text_processor.h"
-#include "word_analyzer.h"
-#include "csv_writer.h"
+#include "../src/file_reader.h"
+#include "../src/text_processor.h"
+#include "../src/word_analyzer.h" 
+#include "../src/csv_writer.h"
 #include <iomanip>
 
 class WordCounterTest : public ::testing::Test {
