@@ -2,20 +2,20 @@
 #define FILE_READER_H
 
 #include <fstream>
-#include <iostream>
-#include <list>
 #include <string>
 
 class FileReader {
 private:
-    std::list<std::string> lines;
+    std::string fileName;
+    std::ifstream in;
+    std::string line;
 
 public:
-    FileReader();
-    bool readFile(const std::string& filename);
-    const std::list<std::string>& getLines() const;
-    size_t getLineCount() const;
-    void clear();
+    explicit FileReader(const std::string& fileName);
+    ~FileReader();
+    bool isOpen() const;
+    bool isEOF() const;
+    const std::string& getLine();
 };
 
 #endif

@@ -3,16 +3,10 @@
 
 #include <string>
 #include <vector>
-#include <list>
-#include <cctype>
 
 class TextProcessor {
 public:
-    TextProcessor();
-    static std::vector<std::string> processLines(const std::list<std::string>& lines);
-    static std::string toLower(const std::string& str);
-    static std::vector<std::string> splitIntoWords(const std::string& line);
-    static bool isWordChar(char c);
+    std::vector<std::string> processLine(const std::string& line);
 };
 
 #endif

@@ -3,16 +3,18 @@
 
 #include <string>
 #include <vector>
-#include <utility>
 #include <fstream>
-#include <iomanip>
 
 class CSVWriter {
+private:
+    std::string fileName;
+    std::ofstream out;
+
 public:
-    CSVWriter();
-    static bool writeCSV(const std::string& filename, 
-                        const std::vector<std::pair<std::string, int>>& sortedWords,
-                        int totalWords);
+    explicit CSVWriter(const std::string& fileName);
+    ~CSVWriter();
+    bool isOpen() const;
+    void write(const std::vector<std::string>& values);
 };
 
 #endif

@@ -1,50 +1,26 @@
 #include "text_processor.h"
+#include <cctype>
+#include <string>
+#include <vector>
 
-TextProcessor::TextProcessor() {}
-
-std::vector<std::string> TextProcessor::processLines(const std::list<std::string>& lines) {
-    std::vector<std::string> allWords;
-    for (std::list<std::string>::const_iterator it = lines.begin(); it != lines.end(); ++it) {
-        std::vector<std::string> words = splitIntoWords(*it);
-        for (size_t i = 0; i < words.size(); ++i) {
-            if (!words[i].empty()) {
-                allWords.push_back(toLower(words[i]));
-            }
-        }
-    }
-    return allWords;//возвращает константную ссылку на все слова
-}
-
-std::string TextProcessor::toLower(const std::string& str) {// Приведение всех символов в строке к нижнему регистру
-    std::string result = str;
-    for (size_t i = 0; i < result.length(); ++i) {
-        result[i] = std::tolower(static_cast<unsigned char>(result[i]));
-    }
-    return result;
-}
-
-std::vector<std::string> TextProcessor::splitIntoWords(const std::string& line) {// Разбивает строку на слова
-    std::vector<std::string> words;     
-    std::string currentWord;
-
-    for (size_t i = 0; i < line.length(); ++i) {
-        char c = line[i];
-        if (isWordChar(c)) {
-            currentWord += c;
+std::vector<std::string> TextProcessor::processLine(const std::string& line) {
+    std::vector<std::string> words;
+    std::string word;
+    
+    for (const char c : line) {
+        if (std::isalnum(static_cast<unsigned char>(c))) {
+            word += std::tolower(static_cast<unsigned char>(c));
         } else {
-            if (!currentWord.empty()) {
-                words.push_back(currentWord);
-                currentWord.clear();
+            if (!word.empty()) {
+                words.push_back(word);
+                word.clear();
             }
         }
     }
-
-    if (!currentWord.empty()) {
-        words.push_back(currentWord);
+    
+    if (!word.empty()) {
+        words.push_back(word);
     }
+    
     return words;
-}
-
-bool TextProcessor::isWordChar(char c) {// Проверка на символ подходящего для разбиения на слова
-    return std::isalnum(static_cast<unsigned char>(c));
 }

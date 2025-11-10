@@ -1,25 +1,36 @@
 #include "csv_writer.h"
 #include <iostream>
 
-CSVWriter::CSVWriter() {}
+CSVWriter::CSVWriter(const std::string &fileName) {
+    this->fileName = fileName;
+    out.open(fileName);
+    if (!out.is_open()) {
+        std::cerr << "Ошибка: Не удалось создать файл " << fileName << std::endl;
+    }
+}
 
-bool CSVWriter::writeCSV(const std::string& filename, 
-                        const std::vector<std::pair<std::string, int>>& sortedWords,
-                        int totalWords) {
-    std::ofstream outputFile(filename);
-    if (!outputFile.is_open()) {
-        std::cerr << "Ошибка: Не удалось создать файл " << filename << std::endl;
-        return false;
+CSVWriter::~CSVWriter() {
+    if (out.is_open()) {
+        out.close();
     }
-    outputFile << "Слово,Частота,Частота (%)\n";
-    for (size_t i = 0; i < sortedWords.size(); ++i) {
-        const std::string& word = sortedWords[i].first;
-        int count = sortedWords[i].second;
-        double percentage = (static_cast<double>(count) / totalWords) * 100.0;//static_cast чтобы делить вещественно
-        outputFile << word << "," << count << "," 
-                   << std::fixed << std::setprecision(4) << percentage << "\n";//4 знаков после запятой
+}
+
+bool CSVWriter::isOpen() const {
+    return out.is_open();
+}
+
+void CSVWriter::write(const std::vector<std::string>& values) {
+    if (!out.is_open()) {
+        std::cerr << "Ошибка: Файл не открыт для записи" << std::endl;
+        return;
     }
-    outputFile.close();
-    std::cout << "Результат записан в файл: " << filename << std::endl;
-    return true;
+
+    for (size_t i = 0; i < values.size(); ++i) {
+        out << values[i];
+        if (i != values.size() - 1) {
+            out << ",";
+        }
+    }
+    out << "\n";
+    out.flush();
 }

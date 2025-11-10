@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <algorithm>
+#include <utility>
 
 class WordAnalyzer {
 private:
@@ -13,12 +13,12 @@ private:
 
 public:
     WordAnalyzer();
-    void analyzeWords(const std::vector<std::string>& words);
-    void clear();
+    void addWord(const std::string& word);
+    void addWords(const std::vector<std::string>& words);
+    std::vector<std::pair<std::string, int>> getSortedWords() const;
     int getTotalWords() const;
     int getUniqueWordsCount() const;
-    std::vector<std::pair<std::string, int>> getSortedWords() const;
-    const std::map<std::string, int>& getWordFrequency() const;
+    void clear();
 };
 
 #endif

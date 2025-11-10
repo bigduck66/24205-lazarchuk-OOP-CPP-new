@@ -1,30 +1,30 @@
 #include "word_analyzer.h"
+#include <algorithm>
 #include <iostream>
 
 WordAnalyzer::WordAnalyzer() : totalWords(0) {}
 
-void WordAnalyzer::analyzeWords(const std::vector<std::string>& words) {// считает частоту каждого слова
-    wordFrequency.clear();
-    totalWords = 0;
-
-    for (size_t i = 0; i < words.size(); ++i) { // Проходим по всем словам и увеличиваем частоту соответствующего слова
-        const std::string& word = words[i];
+void WordAnalyzer::addWord(const std::string& word) {
+    if (!word.empty()) {
         wordFrequency[word]++;
         totalWords++;
     }
-
-    std::cout << "Обработано слов: " << totalWords << std::endl;
-    std::cout << "Уникальных слов: " << wordFrequency.size() << std::endl;
 }
 
-struct CompareByFrequency {// Сортировка слов по частоте
+void WordAnalyzer::addWords(const std::vector<std::string>& words) {
+    for (const auto& word : words) {
+        addWord(word);
+    }
+}
+
+struct CompareByFrequency {
     bool operator()(const std::pair<std::string, int>& a, 
                    const std::pair<std::string, int>& b) const {
         return a.second > b.second;
     }
 };
 
-std::vector<std::pair<std::string, int>> WordAnalyzer::getSortedWords() const {// Возвращает список слов в порядке убывания частоты
+std::vector<std::pair<std::string, int>> WordAnalyzer::getSortedWords() const {
     std::vector<std::pair<std::string, int>> sortedWords(
         wordFrequency.begin(), wordFrequency.end()
     );
@@ -32,19 +32,15 @@ std::vector<std::pair<std::string, int>> WordAnalyzer::getSortedWords() const {/
     return sortedWords;
 }
 
-void WordAnalyzer::clear() {// Очищает словарь частот
-    wordFrequency.clear();
-    totalWords = 0;
-}
-
-int WordAnalyzer::getTotalWords() const {// Возвращает общее число слов
+int WordAnalyzer::getTotalWords() const {
     return totalWords;
 }
 
-int WordAnalyzer::getUniqueWordsCount() const {// Возвращает количество уникальных слов
+int WordAnalyzer::getUniqueWordsCount() const {
     return wordFrequency.size();
 }
 
-const std::map<std::string, int>& WordAnalyzer::getWordFrequency() const {// Возвращает константную ссылку на словарь частот
-    return wordFrequency;
+void WordAnalyzer::clear() {
+    wordFrequency.clear();
+    totalWords = 0;
 }
