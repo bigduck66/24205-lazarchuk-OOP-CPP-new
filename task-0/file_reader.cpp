@@ -20,14 +20,14 @@ bool FileReader::readFile(const std::string& filename) {
     return true;
 }
 
-const std::list<std::string>& FileReader::getLines() const {
+const std::list<std::string>& FileReader::getLines() const {// Возвращает константную ссылку на список строк 
     return lines;
 }
 
-size_t FileReader::getLineCount() const {
+size_t FileReader::getLineCount() const {// Возвращает количество строк в файле
     return lines.size();
 }
 
-void FileReader::clear() {
+void FileReader::clear() {// Очищает список строк
     lines.clear();
 }

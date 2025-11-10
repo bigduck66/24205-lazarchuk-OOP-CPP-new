@@ -11,9 +11,7 @@ bool CSVWriter::writeCSV(const std::string& filename,
         std::cerr << "Ошибка: Не удалось создать файл " << filename << std::endl;
         return false;
     }
-
     outputFile << "Слово,Частота,Частота (%)\n";
-
     for (size_t i = 0; i < sortedWords.size(); ++i) {
         const std::string& word = sortedWords[i].first;
         int count = sortedWords[i].second;
@@ -21,8 +19,6 @@ bool CSVWriter::writeCSV(const std::string& filename,
         outputFile << word << "," << count << "," 
                    << std::fixed << std::setprecision(4) << percentage << "\n";//4 знаков после запятой
     }
-    
-
     outputFile.close();
     std::cout << "Результат записан в файл: " << filename << std::endl;
     return true;
