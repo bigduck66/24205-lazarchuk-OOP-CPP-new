@@ -1,18 +1,15 @@
 #include "file_reader.h"
 #include <iostream>
 
-FileReader::FileReader(const std::string &fileName) {
-    this->fileName = fileName;
-    in.open(fileName);
-    if (!in.is_open()) {
+FileReader::FileReader(const std::string &fileName) : fileName(fileName) {
+    ronka();
+    if (!isOpen()) {
         std::cerr << "Ошибка: Не удалось открыть файл " << fileName << std::endl;
     }
 }
 
 FileReader::~FileReader() {
-    if (in.is_open()) {
-        in.close();
-    }
+    ronka_ushel();
 }
 
 bool FileReader::isOpen() const {
@@ -26,4 +23,14 @@ bool FileReader::isEOF() const {
 const std::string& FileReader::getLine() {
     std::getline(in, line);
     return line;
+}
+
+void FileReader::ronka() {
+    in.open(fileName);
+}
+
+void FileReader::ronka_ushel() {
+    if (isOpen()) {
+        in.close();
+    }
 }

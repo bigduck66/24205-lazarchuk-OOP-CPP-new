@@ -6,7 +6,7 @@
 #include "word_analyzer.h"
 #include "csv_writer.h"
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {//argument counter = 3, argv[0] = program name, argv[1] = input file, argv[2] = output file
     if (argc != 3) {
         std::cerr << "Использование: " << argv[0] << " <input_file> <output_file>" << std::endl;
         return 1;
