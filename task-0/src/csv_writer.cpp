@@ -3,7 +3,7 @@
 
 CSVWriter::CSVWriter(const std::string &fileName) {
     this->fileName = fileName;
-    out.open(fileName);
+    open(fileName);
     if (!out.is_open()) {
         std::cerr << "Ошибка: Не удалось создать файл " << fileName << std::endl;
     }
@@ -11,7 +11,7 @@ CSVWriter::CSVWriter(const std::string &fileName) {
 
 CSVWriter::~CSVWriter() {
     if (out.is_open()) {
-        out.close();
+        close();
     }
 }
 
@@ -33,4 +33,14 @@ void CSVWriter::write(const std::vector<std::string>& values) {
     }
     out << "\n";
     out.flush();
+}
+
+void CSVWriter::open(const std::string& fileName){
+    this->fileName = fileName;
+    close();
+    out.open(fileName);
+}
+
+void CSVWriter::close(){
+    out.close();
 }

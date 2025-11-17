@@ -16,8 +16,9 @@ public:
     bool isOpen() const;
     bool isEOF() const;
     const std::string& getLine();
-    void ronka();
-    void ronka_ushel();
+    void open(const std::string& fileName);
+    // void open();
+    void close();
 };
 
 #endif

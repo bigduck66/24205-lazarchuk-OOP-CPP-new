@@ -15,6 +15,8 @@ public:
     ~CSVWriter();
     bool isOpen() const;
     void write(const std::vector<std::string>& values);
+    void open(const std::string& fileName);
+    void close();
 };
 
 #endif
