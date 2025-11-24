@@ -2,17 +2,19 @@
 #include <iostream>
 #include <string>
 
+void printBitArray(BitArray ba) {  // Неявно вызывается конструктор копирования
+    std::cout << ba.to_string() << std::endl;
+    // При выходе из функции вызывается деструктор для копии
+}
+
+void example1() {
+    BitArray original(8, 0b10101010);  // original: 10101010
+    printBitArray(original);           // Создается копия для функции
+    // original остается неизменным
+}
+
 int main(){
-    BitArray bits(15);
-    bits.set(0, true);
-    bits.set(5, true);
-    bits.set(7, true);
-    BitArray bits1(15);
-    bits1.set(5, true);
-    bits1.set(6, true);
-    bits &= bits1;
-    std::string str = bits.to_string();
-    std::cout << str <<  std::endl;
-    std::string str1 = bits1.to_string();
-    std::cout << str1;
+    BitArray original(15);
+    BitArray copy1 = original;//неявное копирование
+    example1();
 }

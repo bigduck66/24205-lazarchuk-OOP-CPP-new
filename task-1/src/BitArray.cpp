@@ -32,7 +32,9 @@ BitArray::BitArray(const BitArray& other)
     : m_bit_count(other.m_bit_count), m_array_size(other.m_array_size) {
     if (m_array_size > 0) {
         m_data = new unsigned long[m_array_size];
-        std::copy(other.m_data, other.m_data + m_array_size, m_data);
+        for (size_t i = 0; i < m_array_size; ++i) {
+            m_data[i] = other.m_data[i];
+        }
     } else {
         m_data = nullptr;
     }
