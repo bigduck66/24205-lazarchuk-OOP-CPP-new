@@ -8,11 +8,9 @@ class GameOfLife {
 private:
     Universe universe;
     bool running;
-    
     void printUniverse() const;
     void processCommand(const std::string& command);
     void showHelp() const;
-
 public:
     GameOfLife();
     GameOfLife(const std::string& filename);
