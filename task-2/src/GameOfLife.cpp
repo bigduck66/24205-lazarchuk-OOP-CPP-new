@@ -1,7 +1,6 @@
 #include "GameOfLife.h"
 #include <iostream>
 #include <sstream>
-#include <algorithm>
 
 GameOfLife::GameOfLife() : universe(40, 20, "Default Universe"), running(true) {
     // Create a glider as default pattern
