@@ -7,7 +7,6 @@
 #include <chrono>
 #include <future>
 
-// Мок-класс для перехвата ввода/вывода
 class TestGameOfLife : public ::testing::Test {
 protected:
     void SetUp() override {
@@ -195,7 +194,6 @@ TEST_F(TestGameOfLife, RunOfflineModeLargeIterations) {
     const std::string outputFile = "test_large_output.life";
     const int largeIterations = 1000;
     
-    // Должно работать без ошибок
     EXPECT_NO_THROW({
         game.runOffline(inputFile, outputFile, largeIterations);
     });
@@ -365,8 +363,6 @@ TEST_F(TestGameOfLife, RunInteractiveModeDumpCommand) {
         std::remove(dumpFile.c_str());
     }
     
-    // Файл должен быть создан (но это зависит от реализации)
-    // Проверяем хотя бы, что не упало
     EXPECT_TRUE(output.find("saved") != std::string::npos
                 || output.find("Goodbye") != std::string::npos
                 || fileCreated)
@@ -487,7 +483,7 @@ TEST_F(TestGameOfLife, RunWithFileInput) {
     file << "#R B3/S23\n";
     file << "5 5\n";
     file << "6 5\n";
-    file << "7 5\n";  // Блайнер
+    file << "7 5\n";
     file.close();
     
     GameOfLife game(inputFile);
@@ -544,7 +540,6 @@ TEST_F(TestGameOfLife, MultipleRunCalls) {
     
     std::string output = getOutput();
     
-    // Должно работать без ошибок
     EXPECT_TRUE(output.find("Generation") != std::string::npos 
                 || output.find("Goodbye") != std::string::npos)
         << "Output was: " << output;
@@ -560,7 +555,6 @@ TEST_F(TestGameOfLife, NoMemoryLeaksOnDestruction) {
         // Ничего не делаем
     }
     
-    // Если не упало - хорошо
     SUCCEED();
 }
 
@@ -638,7 +632,6 @@ TEST_F(TestGameOfLife, RunOfflineWithManyCells) {
     
     const std::string outputFile = "many_cells_output.life";
     
-    // Должно работать без ошибок
     EXPECT_NO_THROW({
         game.runOffline(inputFile, outputFile, 10);
     });
