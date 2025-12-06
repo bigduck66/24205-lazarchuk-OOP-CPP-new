@@ -2,10 +2,10 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <random>
 #include <algorithm>
-#include <climits> 
+#include <climits>
 
+//  ./gameoflife --input input.life --iterations 100 --output result.life
 Universe::Universe(int w, int h, const std::string& universeName) 
     : width(w), height(h), name(universeName), generation(0) {
     grid.resize(height, std::vector<bool>(width, false));
@@ -214,19 +214,6 @@ std::string Universe::getRulesString() const {
         result += std::to_string(rule);
     }
     return result;
-}
-
-void Universe::randomize() {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, 1);
-    
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            grid[y][x] = dis(gen) == 1;
-        }
-    }
-    generation = 0;
 }
 
 void Universe::clear() {
