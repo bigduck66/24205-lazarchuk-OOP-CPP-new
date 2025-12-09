@@ -12,18 +12,25 @@ BitArray::~BitArray() {
 }
 
 // Constructs a bit array storing specified number of bits
-BitArray::BitArray(int num_bits, unsigned long value) {
+BitArray::BitArray(int num_bits, unsigned long value) 
+    : m_data(nullptr), m_bit_count(0), m_array_size(0) {
+    
     if (num_bits < 0) {
         throw std::invalid_argument("BitArray size cannot be negative");
     }
+    
+    if (num_bits == 0) {
+        return;  // Leave as empty array
+    }
+    
     m_bit_count = static_cast<size_t>(num_bits);
     m_array_size = (m_bit_count + BITS_PER_BLOCK - 1) / BITS_PER_BLOCK;
-
+    
     if (m_array_size > 0) {
         m_data = new unsigned long[m_array_size]();
-        m_data[0] = value; // Initialize only first block as per specification
-    } else {
-        m_data = nullptr;
+        if (num_bits > 0) {
+            m_data[0] = value; // Initialize only first block as per specification
+        }
     }
 }
 
@@ -86,7 +93,7 @@ void BitArray::resize(int num_bits, bool value) {
     
     // Copy existing data
     size_t min_array_size = std::min(m_array_size, new_array_size);
-    if (min_array_size > 0) {
+    if (min_array_size > 0 && m_data != nullptr) {
         std::copy(m_data, m_data + min_array_size, new_data);
     }
 
@@ -136,8 +143,7 @@ void BitArray::push_back(bool bit) {
         m_data[block_idx] |= (1UL << bit_off);
     }
     
-    ++
-        m_bit_count;
+    ++m_bit_count;
 }
 
 // Bitwise AND operation
@@ -146,8 +152,12 @@ BitArray& BitArray::operator&=(const BitArray& other) {
         throw std::invalid_argument("Bit arrays must be of same size for AND operation");
     }
     
+    if (m_data == nullptr || other.m_data == nullptr) {
+        return *this;
+    }
+    
     for (size_t i = 0; i < m_array_size; ++i) {
-        m_data[i] &= other.m_data[i];//example: a.m_data[0]=101, b.m_data[0]=001. result:001
+        m_data[i] &= other.m_data[i];
     }
     
     return *this;
@@ -159,8 +169,12 @@ BitArray& BitArray::operator|=(const BitArray& other) {
         throw std::invalid_argument("Bit arrays must be of same size for OR operation");
     }
     
+    if (m_data == nullptr || other.m_data == nullptr) {
+        return *this;
+    }
+    
     for (size_t i = 0; i < m_array_size; ++i) {
-        m_data[i] |= other.m_data[i];//example: a.m_data[0]=101, b.m_data[0]=001. result:101
+        m_data[i] |= other.m_data[i];
     }
     
     return *this;
@@ -172,20 +186,24 @@ BitArray& BitArray::operator^=(const BitArray& other) {
         throw std::invalid_argument("Bit arrays must be of same size for XOR operation");
     }
     
+    if (m_data == nullptr || other.m_data == nullptr) {
+        return *this;
+    }
+    
     for (size_t i = 0; i < m_array_size; ++i) {
-        m_data[i] ^= other.m_data[i];//возвращает 1 когда биты разные, и 0 когда биты одинаковые.
+        m_data[i] ^= other.m_data[i];
     }
     
     return *this;
 }
 
 // Left shift assignment
-BitArray& BitArray::operator<<=(int n) {//сдвигает все биты массива влево на n позиций.
+BitArray& BitArray::operator<<=(int n) {
     if (n < 0) {
         throw std::invalid_argument("Shift amount cannot be negative");
     }
     
-    if (n == 0 || m_bit_count == 0) {
+    if (n == 0 || m_bit_count == 0 || m_data == nullptr) {
         return *this;
     }
     
@@ -199,12 +217,12 @@ BitArray& BitArray::operator<<=(int n) {//сдвигает все биты ма�
     
     // Perform shift
     for (size_t i = 0; i < m_bit_count - shift_bits; ++i) {
-        set(i, (*this)[i + shift_bits]);
+        set(static_cast<int>(i), (*this)[static_cast<int>(i + shift_bits)]);
     }
     
     // Fill remaining bits with zeros
     for (size_t i = m_bit_count - shift_bits; i < m_bit_count; ++i) {
-        reset(i);
+        reset(static_cast<int>(i));
     }
     
     return *this;
@@ -216,7 +234,7 @@ BitArray& BitArray::operator>>=(int n) {
         throw std::invalid_argument("Shift amount cannot be negative");
     }
     
-    if (n == 0 || m_bit_count == 0) {
+    if (n == 0 || m_bit_count == 0 || m_data == nullptr) {
         return *this;
     }
     
@@ -235,14 +253,14 @@ BitArray& BitArray::operator>>=(int n) {
     
     // Fill beginning bits with zeros
     for (size_t i = 0; i < shift_bits; ++i) {
-        reset(i);
+        reset(static_cast<int>(i));
     }
     
     return *this;
 }
 
 // Left shift
-BitArray BitArray::operator<<(int n) const {//создает новый объект, исходный массив не изменяем
+BitArray BitArray::operator<<(int n) const {
     BitArray result(*this);
     result <<= n;
     return result;
@@ -256,9 +274,13 @@ BitArray BitArray::operator>>(int n) const {
 }
 
 // Sets bit at index n to value val
-BitArray& BitArray::set(int n, bool val) {//устанавливаем бит в конкретное значение
+BitArray& BitArray::set(int n, bool val) {
     if (n < 0 || static_cast<size_t>(n) >= m_bit_count) {
         throw std::out_of_range("Bit index out of range");
+    }
+    
+    if (m_data == nullptr) {
+        return *this;
     }
     
     size_t block_idx = block_index(n);
@@ -275,6 +297,10 @@ BitArray& BitArray::set(int n, bool val) {//устанавливаем бит в
 
 // Sets all bits to true
 BitArray& BitArray::set() {
+    if (m_data == nullptr) {
+        return *this;
+    }
+    
     for (size_t i = 0; i < m_array_size; ++i) {
         m_data[i] = ~0UL;
     }
@@ -298,6 +324,10 @@ BitArray& BitArray::reset(int n) {
 
 // Sets all bits to false
 BitArray& BitArray::reset() {
+    if (m_data == nullptr) {
+        return *this;
+    }
+    
     for (size_t i = 0; i < m_array_size; ++i) {
         m_data[i] = 0UL;
     }
@@ -306,6 +336,10 @@ BitArray& BitArray::reset() {
 
 // Returns true if array contains at least one true bit
 bool BitArray::any() const {
+    if (m_data == nullptr) {
+        return false;
+    }
+    
     for (size_t i = 0; i < m_array_size; ++i) {
         if (m_data[i] != 0) {
             return true;
@@ -320,9 +354,13 @@ bool BitArray::none() const {
 }
 
 // Bitwise inversion
-BitArray BitArray::operator~() const {//создание копии объекта с инвертироваными битами
+BitArray BitArray::operator~() const {
     BitArray result(*this);
-    for (size_t i = 0; i < m_array_size; ++i) {
+    if (result.m_data == nullptr) {
+        return result;
+    }
+    
+    for (size_t i = 0; i < result.m_array_size; ++i) {
         result.m_data[i] = ~result.m_data[i];
     }
     
@@ -349,15 +387,27 @@ int BitArray::count() const {
     return count;
 }
 
-// Returns value of bit at index i
-bool BitArray::operator[](int i) const {//Позволяет обращаться к битам массива как к обычному массиву
+// Returns value of bit at index i (const version)
+bool BitArray::operator[](int i) const {
     if (i < 0 || static_cast<size_t>(i) >= m_bit_count) {
         throw std::out_of_range("Bit index out of range");
+    }
+    
+    if (m_data == nullptr) {
+        return false;
     }
     
     size_t block_idx = block_index(i);
     size_t bit_off = bit_offset(i);
     return (m_data[block_idx] >> bit_off) & 1;
+}
+
+// Returns reference proxy for bit at index i (non-const version)
+BitArray::BitProxy BitArray::operator[](int i) {
+    if (i < 0 || static_cast<size_t>(i) >= m_bit_count) {
+        throw std::out_of_range("Bit index out of range");
+    }
+    return BitProxy(*this, static_cast<size_t>(i));
 }
 
 // Returns size of array in bits
@@ -371,7 +421,7 @@ bool BitArray::empty() const {
 }
 
 // Returns string representation of array
-std::string BitArray::to_string() const {//строка чтоб например посмотреть че там можно было
+std::string BitArray::to_string() const {
     std::string result;
     for (size_t i = 0; i < m_bit_count; ++i) {
         result += ((*this)[i] ? '1' : '0');
@@ -380,7 +430,7 @@ std::string BitArray::to_string() const {//строка чтоб наприме�
 }
 
 // Comparison operators
-bool operator==(const BitArray& a, const BitArray& b) {//равны ли два бит аррей
+bool operator==(const BitArray& a, const BitArray& b) {
     if (a.size() != b.size()) {
         return false;
     }
@@ -397,7 +447,7 @@ bool operator==(const BitArray& a, const BitArray& b) {//равны ли два 
 bool operator!=(const BitArray& a, const BitArray& b) {
     return !(a == b);
 }
-//исходный массивы остаются неизменными
+
 // Bitwise AND
 BitArray operator&(const BitArray& b1, const BitArray& b2) {
     BitArray result(b1);

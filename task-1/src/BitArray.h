@@ -20,7 +20,50 @@ private:
     size_t bit_offset(size_t bit_pos) const { return bit_pos % BITS_PER_BLOCK; }
     unsigned long bit_mask(size_t bit_pos) const { return 1UL << bit_offset(bit_pos); }
 
+    // Proxy class for operator[] assignment
+    class BitProxy {
+    private:
+        BitArray& m_array;
+        size_t m_index;
+        
+    public:
+        BitProxy(BitArray& array, size_t index)
+            : m_array(array), m_index(index) {}
+        
+        // Conversion to bool (for reading) - НЕ ИСПОЛЬЗУЕМ operator[]
+        operator bool() const {
+            // Прямой доступ к данным вместо вызова operator[]
+            if (m_array.m_data == nullptr) {
+                return false;
+            }
+            size_t block_idx = m_array.block_index(m_index);
+            size_t bit_off = m_array.bit_offset(m_index);
+            return (m_array.m_data[block_idx] >> bit_off) & 1;
+        }
+        
+        // Assignment operator (for writing from bool)
+        BitProxy& operator=(bool value) {
+            // Используем set() вместо прямого доступа
+            m_array.set(static_cast<int>(m_index), value);
+            return *this;
+        }
+        
+        // Assignment operator from another BitProxy
+        BitProxy& operator=(const BitProxy& other) {
+            // Получаем значение напрямую
+            bool value = static_cast<bool>(other);
+            m_array.set(static_cast<int>(m_index), value);
+            return *this;
+        }
+        
+        // Prevent taking address
+        BitProxy* operator&() = delete;
+    };
+    
 public:
+    // Nested classes need to be friend to access private members
+    friend class BitProxy;
+
     // Constructs an empty bit array
     BitArray();
     
@@ -84,8 +127,11 @@ public:
     // Counts number of true bits
     int count() const;
 
-    // Returns value of bit at index i
+    // Returns value of bit at index i (const version)
     bool operator[](int i) const;
+    
+    // Returns reference proxy for bit at index i (non-const version)
+    BitProxy operator[](int i);
     
     // Returns size of array in bits
     int size() const;
