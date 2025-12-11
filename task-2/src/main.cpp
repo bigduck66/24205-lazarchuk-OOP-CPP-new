@@ -15,7 +15,6 @@ int main(int argc, char* argv[]) {
     int iterations = 0;
     bool offlineMode = false;
     
-    // Parse command line arguments// Parse command line arguments
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
         
@@ -34,7 +33,6 @@ int main(int argc, char* argv[]) {
                 inputFile = argv[++i];
             }
         } else if (arg.substr(0, 2) != "--" && inputFile.empty()) {
-            // Assume it's an input file
             inputFile = arg;
         }
     }

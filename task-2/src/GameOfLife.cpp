@@ -1,9 +1,9 @@
 #include "GameOfLife.h"
+#include "Command.h"
 #include <iostream>
-#include <sstream>
+#include <memory>
 
 GameOfLife::GameOfLife() : universe(40, 20, "Default Universe"), running(true) {
-    // Create a glider as default pattern
     universe.setCell(1, 0, true);
     universe.setCell(2, 1, true);
     universe.setCell(0, 2, true);
@@ -36,46 +36,6 @@ void GameOfLife::showHelp() const {
     std::cout << "  exit - quit the game\n";
 }
 
-void GameOfLife::processCommand(const std::string& command) {
-    std::istringstream iss(command);
-    std::string cmd;
-    iss >> cmd;
-    
-    if (cmd == "help") {
-        showHelp();
-    } else if (cmd == "tick" || cmd == "t") {
-        int n = 1;
-        if (iss >> n) {
-            if (n > 0) {
-                universe.nextGenerations(n);
-                printUniverse();
-            } else {
-                std::cout << "Number of iterations must be positive\n";
-            }
-        } else {
-            universe.nextGeneration();
-            printUniverse();
-        }
-    } else if (cmd == "dump") {
-        std::string filename;
-        if (iss >> filename) {
-            try {
-                universe.saveToFile(filename);
-                std::cout << "Universe saved to " << filename << std::endl;
-            } catch (const std::exception& e) {
-                std::cout << "Error saving file: " << e.what() << std::endl;
-            }
-        } else {
-            std::cout << "Usage: dump <filename>\n";
-        }
-    } else if (cmd == "exit") {
-        running = false;
-        std::cout << "Goodbye!\n";
-    } else {
-        std::cout << "Unknown command. Type 'help' for available commands.\n";
-    }
-}
-
 void GameOfLife::run() {
     std::cout << "Welcome to Game of Life!" << std::endl;
     showHelp();
@@ -83,12 +43,23 @@ void GameOfLife::run() {
     
     while (running) {
         std::cout << "> ";
-        std::string command;
-        std::getline(std::cin, command);
+        std::string commandStr;
+        std::getline(std::cin, commandStr);
         
-        if (command.empty()) continue;
+        if (commandStr.empty()) continue;
         
-        processCommand(command);
+        try {
+            std::unique_ptr<Command> command = CommandParser::parse(commandStr);
+            command->execute(*this);
+            
+            std::string cmdName = command->getName();
+            if (cmdName == "tick" || cmdName == "dump") {
+                printUniverse();
+            }
+        } catch (const std::exception& e) {
+            std::cout << "Error: " << e.what() << std::endl;
+            std::cout << "Type 'help' for available commands\n";
+        }
     }
 }
 

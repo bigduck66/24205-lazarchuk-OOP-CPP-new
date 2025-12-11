@@ -37,7 +37,6 @@ public:
     const std::string& getName() const { return name; }
     std::string getRulesString() const;
     
-    void randomize();
     void clear();
 };
 
