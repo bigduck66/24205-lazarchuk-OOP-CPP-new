@@ -32,22 +32,22 @@ void ExitCommand::execute(GameOfLife& game) {
 }
 
 std::unique_ptr<Command> CommandParser::parse(const std::string& commandStr) {
-    std::istringstream iss(commandStr);
+    std::istringstream iss(commandStr);//разбиваем строку на части
     std::string cmd;
-    iss >> cmd;
+    iss >> cmd;//извлекаем первое слово
     
     std::string lowerCmd;
     for (char c : cmd) {
-        lowerCmd += std::tolower(c);
+        lowerCmd += std::tolower(c);//приводим к нижнему регистру
     }
     
     if (lowerCmd == "help") {
-        return std::make_unique<HelpCommand>();
+        return std::make_unique<HelpCommand>();//создаем HelpCommand
     }
     else if (lowerCmd == "tick" || lowerCmd == "t") {
         int n = 1;
         if (iss >> n) {
-            return std::make_unique<TickCommand>(n);
+            return std::make_unique<TickCommand>(n);//TickCommand c числом
         } else {
             iss.clear();
             iss.seekg(0);
