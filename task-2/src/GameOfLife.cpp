@@ -49,8 +49,8 @@ void GameOfLife::run() {
         if (commandStr.empty()) continue;
         
         try {
-            std::unique_ptr<Command> command = CommandParser::parse(commandStr);
-            command->execute(*this);
+            std::unique_ptr<Command> command = CommandParser::parse(commandStr);//возращает указатель на базовый класс Command, создается конктретный объект наследник
+            command->execute(*this);//вызывается конкретный метод из класса наследника
             
             std::string cmdName = command->getName();
             if (cmdName == "tick" || cmdName == "dump") {
